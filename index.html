@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>PVG Departures</title>
+
+<style>
+    * {
+        box-sizing: border-box;
+    }
+
+    html, body {
+        margin: 0;
+        width: 100%;
+        height: 100%;
+        background: white;
+        color: black;
+        font-family: Arial, Helvetica, sans-serif;
+    }
+
+    body {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .board {
+        width: 100%;
+        max-width: 800px;
+        padding: 25px 35px;
+    }
+
+    .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        border-bottom: 4px solid black;
+        padding-bottom: 12px;
+        margin-bottom: 15px;
+    }
+
+    .title {
+        font-size: 30px;
+        font-weight: bold;
+    }
+
+    .pvg {
+        font-size: 24px;
+        font-weight: bold;
+    }
+
+    .departure {
+        display: grid;
+        grid-template-columns: 100px 80px 1fr;
+        align-items: center;
+        min-height: 62px;
+        border-bottom: 2px solid #777;
+    }
+
+    .time {
+        font-size: 30px;
+        font-weight: bold;
+    }
+
+    .line {
+        font-size: 27px;
+        font-weight: bold;
+    }
+
+    .destination {
+        font-size: 25px;
+    }
+
+    .status {
+        margin-top: 15px;
+        font-size: 16px;
+    }
+
+    .loading {
+        font-size: 28px;
+        padding: 30px 0;
+    }
+</style>
+</head>
+
+<body>
+
+<div class="board">
+
+    <div class="header">
+        <div class="title">
+            ABZWEIG N. NIEDERGRUNSTEDT
+        </div>
+
+        <div class="pvg">
+            PVG
+        </div>
+    </div>
+
+    <div id="departures">
+
+        <div class="loading">
+            Loading departures...
+        </div>
+
+    </div>
+
+    <div class="status">
+        VMT • Live departures
+    </div>
+
+</div>
+
+<script>
+
+    /*
+     * VMT DEPARTURE BOARD
+     *
+     * The actual VMT connection will be added next.
+     * For now this page only provides the display.
+     */
+
+    const testDepartures = [
+        {
+            time: "17:51",
+            line: "221",
+            destination: "Weimar Hbf"
+        },
+        {
+            time: "18:06",
+            line: "237",
+            destination: "Bad Berka"
+        },
+        {
+            time: "18:21",
+            line: "221",
+            destination: "Weimar Hbf"
+        },
+        {
+            time: "18:36",
+            line: "237",
+            destination: "Kranichfeld"
+        }
+    ];
+
+    function showDepartures(departures) {
+
+        const container =
+            document.getElementById("departures");
+
+        container.innerHTML = "";
+
+        departures.forEach(function(departure) {
+
+            const row =
+                document.createElement("div");
+
+            row.className = "departure";
+
+            row.innerHTML = `
+                <div class="time">
+                    ${departure.time}
+                </div>
+
+                <div class="line">
+                    ${departure.line}
+                </div>
+
+                <div class="destination">
+                    ${departure.destination}
+                </div>
+            `;
+
+            container.appendChild(row);
+        });
+    }
+
+    showDepartures(testDepartures);
+
+</script>
+
+</body>
+</html>
