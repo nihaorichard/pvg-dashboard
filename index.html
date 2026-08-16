@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>PVG Abzweig Niedergrunstedt</title>
+<title>PVG – Abzweig n. Niedergrunstedt</title>
 
 <style>
 
@@ -30,8 +31,11 @@ body {
 .board {
     width: 100%;
     max-width: 800px;
-    padding: 25px 35px;
+    padding: 18px 28px;
 }
+
+
+/* HEADER */
 
 .header {
     display: flex;
@@ -40,75 +44,115 @@ body {
 
     border-bottom: 4px solid black;
 
-    padding-bottom: 12px;
-    margin-bottom: 12px;
+    padding-bottom: 8px;
+    margin-bottom: 5px;
 }
 
 .title {
-    font-size: 29px;
+    font-size: 28px;
     font-weight: bold;
 }
 
 .pvg {
-    font-size: 24px;
+    font-size: 23px;
     font-weight: bold;
 }
+
+
+/* COLUMN HEADERS */
+
+.departure-header {
+    display: grid;
+
+    grid-template-columns:
+        90px
+        65px
+        1fr
+        90px;
+
+    align-items: center;
+
+    height: 28px;
+
+    font-size: 12px;
+    font-weight: bold;
+
+    border-bottom: 2px solid black;
+}
+
+.departure-header div:nth-child(3) {
+    padding-left: 4px;
+}
+
+
+/* DEPARTURES */
 
 .departure {
     display: grid;
 
     grid-template-columns:
-        105px
-        75px
-        1fr;
+        90px
+        65px
+        1fr
+        90px;
 
     align-items: center;
 
-    min-height: 62px;
+    height: 54px;
 
-    border-bottom: 2px solid #777;
+    border-bottom: 1px solid #777;
 }
 
 .time {
-    font-size: 30px;
-    font-weight: bold;
-}
-
-.line {
     font-size: 27px;
     font-weight: bold;
 }
 
-.destination {
-    font-size: 25px;
+.line {
+    font-size: 24px;
+    font-weight: bold;
 }
 
-.delay {
-    font-size: 18px;
-    margin-left: 8px;
+.destination {
+    font-size: 23px;
+    padding-left: 4px;
 }
+
+.info {
+    font-size: 17px;
+    font-weight: bold;
+}
+
+
+/* STATUS */
 
 .status {
-    margin-top: 14px;
-    font-size: 16px;
+    margin-top: 8px;
+    font-size: 13px;
 }
 
 .loading {
-    font-size: 25px;
+    font-size: 23px;
     padding: 30px 0;
 }
 
 .error {
-    font-size: 22px;
-    padding: 30px 0;
+    font-size: 20px;
+    padding: 25px 0;
 }
 
 </style>
+
 </head>
+
 
 <body>
 
+
 <div class="board">
+
+
+    <!-- TITLE -->
 
     <div class="header">
 
@@ -123,6 +167,33 @@ body {
     </div>
 
 
+    <!-- COLUMN HEADERS -->
+
+    <div class="departure-header">
+
+        <div>
+            Abfahrt<br>
+            Departure
+        </div>
+
+        <div>
+            Linie<br>
+            Line
+        </div>
+
+        <div>
+            Richtung / Towards
+        </div>
+
+        <div>
+            Info
+        </div>
+
+    </div>
+
+
+    <!-- LIVE DEPARTURES -->
+
     <div id="departures">
 
         <div class="loading">
@@ -132,9 +203,15 @@ body {
     </div>
 
 
-    <div class="status" id="status">
+    <!-- STATUS -->
+
+    <div
+        class="status"
+        id="status"
+    >
         VMT • Live
     </div>
+
 
 </div>
 
@@ -143,23 +220,42 @@ body {
 
 
 /*
-    YOUR CLOUDFLARE WORKER
+==================================================
+CLOUDFLARE WORKER
+==================================================
 
-    IMPORTANT:
-    Replace the URL below with your
-    workers.dev URL.
+IMPORTANT:
+
+Replace the URL below with YOUR EXISTING
+WORKING workers.dev URL.
+
+Example:
+
+https://pvg-departures-xxxx.yourname.workers.dev
+
+==================================================
 */
 
+
 const API_URL =
-    "https://pvg-departures.richardthiele03.workers.dev";
+    "pvg-departures.richardthiele03.workers.dev";
+
+
+/*
+==================================================
+LOAD DEPARTURES
+==================================================
+*/
 
 
 async function loadDepartures() {
+
 
     const container =
         document.getElementById(
             "departures"
         );
+
 
     const status =
         document.getElementById(
@@ -168,6 +264,7 @@ async function loadDepartures() {
 
 
     try {
+
 
         const response =
             await fetch(API_URL);
@@ -190,95 +287,203 @@ async function loadDepartures() {
         container.innerHTML = "";
 
 
+        /*
+        ==========================================
+        NO DEPARTURES
+        ==========================================
+        */
+
+
         if (
             !data.departures ||
             data.departures.length === 0
         ) {
 
+
             container.innerHTML =
+
                 '<div class="loading">' +
-                'Keine Abfahrten gefunden' +
+
+                'Keine weiteren Abfahrten' +
+
                 '</div>';
 
+
+            status.innerHTML =
+                "VMT • Aktualisiert " +
+                (data.updated || "");
+
+
             return;
+
         }
 
 
-        data.departures.forEach(
-            function(departure) {
+        /*
+        ==========================================
+        SHOW DEPARTURES
+        ==========================================
+        */
 
 
-                const row =
-                    document.createElement(
-                        "div"
+        data.departures
+            .slice(0, 6)
+            .forEach(
+                function(departure) {
+
+
+                    const row =
+                        document.createElement(
+                            "div"
+                        );
+
+
+                    row.className =
+                        "departure";
+
+
+                    /*
+                    ==================================
+                    LINE NUMBER
+                    ==================================
+                    */
+
+
+                    let line =
+                        departure.line ||
+                        "";
+
+
+                    /*
+                    ==================================
+                    DESTINATION
+
+                    IMPORTANT:
+                    We use the actual destination
+                    text returned by VMT.
+
+                    Example:
+                    Blankenhain
+                    Weimar
+                    Bad Berka
+
+                    NOT a numeric ID.
+                    ==================================
+                    */
+
+
+                    let destination =
+                        departure.destination ||
+                        "";
+
+
+                    /*
+                    ==================================
+                    DELAY
+                    ==================================
+                    */
+
+
+                    let info =
+                        "";
+
+
+                    if (
+                        departure.delay &&
+                        Number(
+                            departure.delay
+                        ) > 0
+                    ) {
+
+
+                        info =
+                            "+" +
+                            departure.delay +
+                            " min";
+
+
+                    } else {
+
+
+                        info =
+                            "on time";
+
+                    }
+
+
+                    /*
+                    ==================================
+                    CREATE ROW
+                    ==================================
+                    */
+
+
+                    row.innerHTML = `
+
+                        <div class="time">
+                            ${departure.time || ""}
+                        </div>
+
+                        <div class="line">
+                            ${line}
+                        </div>
+
+                        <div class="destination">
+                            ${destination}
+                        </div>
+
+                        <div class="info">
+                            ${info}
+                        </div>
+
+                    `;
+
+
+                    container.appendChild(
+                        row
                     );
 
 
-                row.className =
-                    "departure";
-
-
-                let delayText = "";
-
-
-                if (
-                    departure.delay &&
-                    departure.delay > 0
-                ) {
-
-                    delayText =
-                        "+" +
-                        departure.delay +
-                        " min";
-
                 }
+            );
 
 
-                row.innerHTML = `
-
-                    <div class="time">
-                        ${departure.time}
-                    </div>
-
-                    <div class="line">
-                        ${departure.line}
-                    </div>
-
-                    <div class="destination">
-                        ${departure.destination}
-
-                        <span class="delay">
-                            ${delayText}
-                        </span>
-                    </div>
-
-                `;
-
-
-                container.appendChild(row);
-
-            }
-        );
+        /*
+        ==========================================
+        UPDATED TIME
+        ==========================================
+        */
 
 
         status.innerHTML =
             "VMT • Aktualisiert " +
-            data.updated;
+            (data.updated || "");
 
 
-    } catch (error) {
+    }
 
-        console.error(error);
+
+    catch (error) {
+
+
+        console.error(
+            "VMT error:",
+            error
+        );
 
 
         container.innerHTML =
+
             '<div class="error">' +
+
             'VMT-Daten momentan nicht verfügbar' +
+
             '</div>';
 
 
         status.innerHTML =
-            "Verbindungsfehler";
+            "VMT • Verbindungsfehler";
+
 
     }
 
@@ -286,15 +491,23 @@ async function loadDepartures() {
 
 
 /*
-    Load immediately
+==================================================
+LOAD IMMEDIATELY
+==================================================
 */
+
 
 loadDepartures();
 
 
 /*
-    Update every 60 seconds
+==================================================
+AUTOMATIC UPDATE
+
+Every 60 seconds
+==================================================
 */
+
 
 setInterval(
     loadDepartures,
@@ -303,6 +516,7 @@ setInterval(
 
 
 </script>
+
 
 </body>
 </html>
